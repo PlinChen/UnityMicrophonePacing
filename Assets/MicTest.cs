@@ -90,7 +90,7 @@ public class MicTest : MonoBehaviour
             return;
         }
         
-        // 获取麦克风设备
+        // Get microphone devices
         var devices = Microphone.devices;
         if (devices.Length == 0)
         {
@@ -106,18 +106,18 @@ public class MicTest : MonoBehaviour
 
         MicNameText.text = string.Join(";\n", devices.Select((d, i) => $"[{i}] {d}"));
         
-        // 获取第一个麦克风设备
+        // Use first microphone device as default
         var device = devices[_micIndex];
         MicNameText.text += "\n\n" + device;
         
-        // 获取麦克风采样率
+        // get microphone device caps
         var minFreq = 0;
         var maxFreq = 0;
         Microphone.GetDeviceCaps(device, out minFreq, out maxFreq);
         var useFreq = maxFreq > 0 ? maxFreq : AudioSettings.outputSampleRate;
         MicNameText.text += $"... minFreq:{minFreq}, maxFreq:{maxFreq}, useFreq:{useFreq}";
         
-        // 获取麦克风采样数据
+        // start microphone recording
         CloudStreaming.EnableMicRecording();
         var clip = Microphone.Start(device, true, 1, useFreq);
         MicAudioSource.clip = clip;
