@@ -85,7 +85,6 @@ public class MicTest : MonoBehaviour
             MicAudioSource.Stop();
             MicAudioSource.clip = null;
             MicNameText.text = "Mic Disabled";
-            CloudStreaming.DisableMicRecording();
             OnKeepPaceToggle(false);
             return;
         }
@@ -118,7 +117,6 @@ public class MicTest : MonoBehaviour
         MicNameText.text += $"... minFreq:{minFreq}, maxFreq:{maxFreq}, useFreq:{useFreq}";
         
         // start microphone recording
-        CloudStreaming.EnableMicRecording();
         var clip = Microphone.Start(device, true, 1, useFreq);
         MicAudioSource.clip = clip;
         MicAudioSource.loop = MicLoopToggle.isOn;
@@ -185,22 +183,26 @@ public class MicTest : MonoBehaviour
             micDevicePositionSlider.value = micDevicePosition;
             micADevicePositionText.text = micDevicePosition.ToString();
             
-            //
-            if (!KeepPaceToggle.isOn)
+            if (KeepPaceToggle.isOn)
             {
-                var audioPositionDiff = (micAudioPosition - lastMicAudioPosition + audioOutputSampleRate) % audioOutputSampleRate;
-                var devicePositionDiff = (micDevicePosition - lastMicDevicePosition + audioOutputSampleRate) % audioOutputSampleRate;
-                var time = Time.deltaTime;
-                var rightDiff = time * audioOutputSampleRate;
-
-                var audioDiffRate = 100f * (audioPositionDiff - rightDiff) / rightDiff;
-                var deviceDiffRate = 100f * (devicePositionDiff - rightDiff) / rightDiff;
-                Debug.Log("audioDiffRate:" + audioDiffRate + ", deviceDiffRate:" + deviceDiffRate);
+                yield return new WaitForSeconds(0.3f);
+                continue;
             }
+            // compute diff info
+            var audioPositionDiff = (micAudioPosition - lastMicAudioPosition + audioOutputSampleRate) % audioOutputSampleRate;
+            var devicePositionDiff = (micDevicePosition - lastMicDevicePosition + audioOutputSampleRate) % audioOutputSampleRate;
+            var time = Time.deltaTime;
+            var rightDiff = time * audioOutputSampleRate;
+
+            var audioDiffRate = 100f * (audioPositionDiff - rightDiff) / rightDiff;
+            var deviceDiffRate = 100f * (devicePositionDiff - rightDiff) / rightDiff;
+            Debug.Log("audioDiffRate:" + audioDiffRate + ", deviceDiffRate:" + deviceDiffRate);
+
+            // set last position
             lastMicAudioPosition = micAudioPosition;
             lastMicDevicePosition = micDevicePosition;
             
-            yield return null; // new WaitForSeconds(0.03f)
+            yield return null; //
         }
     }
 }
