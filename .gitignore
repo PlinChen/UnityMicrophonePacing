@@ -1,0 +1,10 @@
+ZBuild*
+.idea*
+Library*
+obj*
+Temp*
+UserSettings*
+Logs*
+Packages/packages-lock.json
+*.csproj
+*.sln
